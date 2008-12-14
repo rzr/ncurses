@@ -1,460 +1,3 @@
-ncurses (5.9-2) UNRELEASED; urgency=low
-
-  * Configure all library builds except libncurses5 with "--without-progs"
-    to reduce build time a bit.
-  * Add build-arch and build-indep targets to debian/rules.
-  * Use dh_install's "--fail-missing" option.
-  * Build libncurses5 and libncursesw5 for multiarch.
-  * Bump debhelper compatibility level to 8.
-  * Upgrade Standards-Version to 3.9.2, no changes needed.
-
- -- Sven Joachim <svenjoac@gmx.de>  Mon, 30 May 2011 17:17:46 +0200
-
-ncurses (5.9-1) unstable; urgency=low
-
-  * New upstream release.
-  * Correct dh_strip usage in debian/rules (Closes: #619939).
-
- -- Sven Joachim <svenjoac@gmx.de>  Tue, 05 Apr 2011 20:37:53 +0200
-
-ncurses (5.8+20110307-1) unstable; urgency=low
-
-  * New upstream patchlevel.
-    - Fixes bad bound checks in newwin() (Closes: #616711, #617210).
-  * Update years in debian/copyright.
-  * Add a debian/watch.patchlevel file for checking/downloading weekly
-    snapshots with uscan.
-
- -- Sven Joachim <svenjoac@gmx.de>  Tue, 08 Mar 2011 20:32:23 +0100
-
-ncurses (5.8-1) unstable; urgency=low
-
-  * New upstream release.
-  * Drop patch 01-debian-kfreebsd-terminfo.patch, applied upstream.
-  * Ship .pc files for pkg-config in libncurses5-dev and libncursesw5-dev,
-    adding a build-dependency on pkg-config (Closes: #609614).
-  * Update rxvt-unicode terminfo description from upstream CVS Rev 1.29.
-    - Introduce an rxvt-unicode-256color terminfo entry in ncurses-term
-      (Closes: #613171).
-    - Fix typo in kIC terminfo capability (Closes: #446444).
-  * Adjust the Replaces/Breaks combination on mlterm-common, now that
-    mlterm 3.0.2-1 has dropped the mlterm terminfo entry.
-  * Fix the libncursesw5-dbg preinst which had been removing the wrong
-    symlink since it was introduced.
-  * Drop the other preinst scripts, they were only necessary for upgrades
-    from pre-Lenny versions.
-  * Use linux-any wildcard for libgpm-dev Build-Depends and
-    libgpm2 Recommends instead of using a list of negated architectures.
-  * Do not run uupdate from debian/watch.
-
- -- Sven Joachim <svenjoac@gmx.de>  Mon, 28 Feb 2011 19:05:25 +0100
-
-ncurses (5.7+20101128-1) experimental; urgency=low
-
-  [ Sven Joachim ]
-  * New upstream patchlevel.
-    - Clarify that infotocap, captoinfo and tic read text files and do
-      not work with compiled terminfo files (Closes: #593920).
-  * Remove dangling /usr/share/terminfo/k/kon2 symlink (Closes: #522435).
-  * Add an ncurses-examples package containing the compiled test programs
-    (Closes: #34182).  Stop shipping the sources in libncurses5-dev.
-  * Move documentation and section 3 manpages to a new ncurses-doc package
-    (Closes: #233400).  Suggest ncurses-doc in all -dev packages.
-  * Register the documentation in doc-base (Closes: #451667).
-  * Remove the rather useless README.Debian (Closes: #606034).
-  * Move libtic libraries to /usr.
-  * Tighten the dependencies of the lib{32,64}ncurses*-dev packages to their
-    regular counterparts.
-  * Provide symbols files in all library packages.
-    - Use them to compute the dependencies of the other packages instead of
-      messing around with local shlibs files.
-  * Ship mlterm terminfo in ncurses-term (see #485448).
-  * Ship curses and termcap symlinks in lib{32,64}ncurses5-dev (LP: #485118).
-  * Add lintian override for the empty /usr/share/terminfo directory that
-    was introduced in 5.7+20100313-2.
-  * Stop building the test programs in every library build.
-  * Fix non-idempotency of the install (and thus the binary) target in
-    debian/rules introduced in 5.7+20100313-1.
-  * Do not unnecessarily add /lib32 and /usr/lib32 to dh_shlibdeps' search
-    path when calculating the dependencies of the 32-bit libraries.
-  * Do not allow dh_shlibdeps to fail for the 64-bit libraries.
-  * Drop most patches as obsolete or unused:
-    - 09-fix-delscreen-segfault.diff, applied upstream.
-    - 06-kfreebsd.diff, apparently no longer needed.
-    - 03-linux-use-fsuid.diff, patched code that is not compiled if ncurses
-      is configured with "--disable-termcap", as we do.
-    - 01-use-d-reentrant.diff, no longer needed since all architectures moved
-      away from LinuxThreads and Policy 3.9.1 has explicitly removed the need
-      to #define _REENTRANT.
-  * Refresh all remaining Debian patches and add DEP-3 headers to them.
-  * Remove the fix for bug #127622 from 02-debian-backspace.diff,
-    no longer needed.
-  * Update patch 02-debian-backspace.diff to get kbs=\177 in all screen-*
-    terminfo entries (Closes: #602300).
-  * Drop the rather outdated screen terminfo from the debian directory and use
-    the one provided by upstream's terminfo.src instead.
-  * Get CFLAGS, CXXFLAGS and LDFLAGS from dpkg-buildflags, adding a build
-    dependency on dpkg-dev (>= 1.15.7).
-  * Switch to format 3.0 (quilt).
-    - Remove quilt build dependency and patch/unpatch logic from debian/rules.
-    - Drop debian/README.source.
-  * Add a debian/watch file.
-  * Extend the package descriptions.
-  * Remove duplicate "Priority:" fields from debian/control.
-  * Update debian/copyright:
-    - Update FSF Copyright years.
-    - Mention other copyright holders and licenses.
-    - Give a pointer to the current location of the ncurses sources.
-    - Stop mentioning Debian changes.
-  * Upgrade Standards-Version to 3.9.1, no changes needed.
-
-  [ Loïc Minier ]
-  * Update patch 05-emdebian-wchar to apply cleanly.
-  * Drop 08-pkg-config-libdir patch as dpkg >= 1.15.6 don't set
-    PKG_CONFIG_LIBDIR anymore.
-
-  [ Steve Langasek ]
-  * Export LDFLAGS in debian/rules (Closes: #586144).
-
- -- Sven Joachim <svenjoac@gmx.de>  Mon, 29 Nov 2010 16:41:55 +0100
-
-ncurses (5.7+20100313-5) unstable; urgency=low
-
-  * New patch 01-debian-kfreebsd-terminfo.patch, adding a cons25-debian
-    terminfo entry to ncurses-base for the Debian GNU/kfreebsd console
-    (Closes: #607662).
-
- -- Sven Joachim <svenjoac@gmx.de>  Wed, 29 Dec 2010 19:55:00 +0100
-
-ncurses (5.7+20100313-4) unstable; urgency=low
-
-  * New patch 09-fix-delscreen-segfault.diff taken from upstream
-    patchlevel 20100501, fixes a segfault or infinite loop in applications
-    using multiple screens (Closes: #597175).
-
- -- Sven Joachim <svenjoac@gmx.de>  Tue, 28 Sep 2010 07:08:17 +0200
-
-ncurses (5.7+20100313-3) unstable; urgency=low
-
-  * Fix dangling symlinks in ncurses-term that were introduced by the
-    removal of the ncurses-base compatibility symlinks in version
-    5.7+20100313-1 (Closes: #576127).  Add versioned Breaks against older
-    ncurses-term versions in ncurses-base.
-  * Correct rxvt-unicode sgr0 terminfo entry (Closes: #595484).
-
- -- Sven Joachim <svenjoac@gmx.de>  Sat, 11 Sep 2010 21:13:00 +0200
-
-ncurses (5.7+20100313-2) unstable; urgency=medium
-
-  [ Sven Joachim ]
-  * Disable rmm and smm features in xterm terminfo entry (see #574396).
-  * Include an empty /usr/share/terminfo directory in ncurses-bin to
-    ensure that configure scripts detect terminfo support (Closes: #575284).
-  * Let libncurses5-dev and libncursesw5-dev depend on the same version of
-    ncurses-bin to mitigate the impact of #480437.
-  * Explicitly specify source format 1.0 (lintian warning).
-
- -- Sven Joachim <svenjoac@gmx.de>  Thu, 25 Mar 2010 14:13:38 +0100
-
-ncurses (5.7+20100313-1) unstable; urgency=low
-
-  [ Sven Joachim ]
-  * New upstream patchlevel.
-    - Workaround for bug in g++ 4.1-4.4 warnings for wattrset() macro
-      on amd64 (Closes: #542031).
-    - Fix typo in curs_mouse.3x (Closes: #429198).
-    - Modify CF_MAN_PAGES configure macro to replace all occurrences of
-      TPUT in tput.1's manpage (Closes: #573597).
-    - Bump shlibs version, as there are several new symbols.
-  * Remove patch introduced in 5.5-2, applied upstream. Remove patch
-    introduced in version 5.7+20090627-1, no longer necessary.
-  * Switch patch system to quilt.
-    - Add a short debian/README.source as recommended by policy.
-  * Configure with /usr/share/terminfo as default terminfo dir, so that
-    we get the correct tabset directory (Closes: #509919, LP: #200773).
-  * Update xterm terminfo entry from xterm 246 (Closes: #444250).
-  * Derive xterm{16,256,88}-color from xterm-debian rather than
-    xterm-new for correct backspace key behavior.
-  * Move the debugging libraries back to /usr/lib/debug (Closes: #553239),
-    ship detached debugging symbols (Closes: #532022).
-  * Fix typo in debian/rules that lead to a dangling symlink in
-    lib64ncurses-dev (Closes: #563272).
-  * Install the binaries built without trace support in ncurses-bin
-    to avoid symbol lookup errors (Closes: #365120).
-  * Build static libraries with "--without-dlsym" (Closes: #556378).
-  * Remove compatibility symlinks in /usr/share/terminfo that were only
-    necessary for upgrades from versions prior to 5.4-9.
-  * debian/control cleanups:
-    - Adjust priority of the source package to required.
-    - Remove duplicate Section field for library packages.
-    - Fix dependencies of lib32ncursesw5-dev.
-    - Fix long descriptions of 32-bit packages on 64-bit systems.
-    - Do not recommend libgpm2 in non-native library packages, nor on
-      non-Linux architectures.
-    - Remove very old Replaces/Conflicts/Provides on ncurses-developer,
-      ncurses and tput.
-    - Version the "Replaces: ia32-libs" for lib32ncurses-dev.
-    - Remove no longer needed "Replaces: ncurses-term" and
-      "Depends: libncurses5" from ncurses-base.
-    - Set Homepage field to http://invisible-island.net/ncurses/.
-    - Add Vcs-Browser and Vcs-Git fields.
-    - Add ${misc:Depends} in all Depends fields.
-    - Add myself to Uploaders.
-  * Add lintian override for alleged spelling error in ncurses-base'
-    extended description; "linux" refers to a terminal type there.
-  * Use dh_install instead of dh_movefiles to install files and clean
-    up debian/rules a bit.
-  * Update Standards-Version to 3.8.4, no changes needed.
-
-  [ Craig Small ]
-  * New maintainer Closes: 543852
-  * Cross compile patch applied Closes: #550716
-
- -- Sven Joachim <svenjoac@gmx.de>  Sun, 21 Feb 2010 09:45:58 +0100
-
-ncurses (5.7+20090803-2) unstable; urgency=low
-
-  * Updating package to standards version 3.8.3.
-  * Removing vcs fields.
-  * Orphaning package.
-
- -- Daniel Baumann <daniel@debian.org>  Thu, 27 Aug 2009 08:42:21 +0200
-
-ncurses (5.7+20090803-1) unstable; urgency=low
-
-  * Merging upstream version 5.7+20090803:
-    - fixes regression with UTF-8 characters (Closes: #539735, #539745).
-
- -- Daniel Baumann <daniel@debian.org>  Tue, 04 Aug 2009 11:19:05 +0200
-
-ncurses (5.7+20090801-1) unstable; urgency=low
-
-  * Merging upstream version 5.7+20090801.
-
- -- Daniel Baumann <daniel@debian.org>  Tue, 04 Aug 2009 11:15:22 +0200
-
-ncurses (5.7+20090728-1) unstable; urgency=low
-
-  * Merging upstream version 5.7+20090728.
-
- -- Daniel Baumann <daniel@debian.org>  Mon, 03 Aug 2009 15:12:44 +0200
-
-ncurses (5.7+20090725-1) unstable; urgency=low
-
-  * Merging upstream version 5.7+20090725.
-
- -- Daniel Baumann <daniel@debian.org>  Mon, 03 Aug 2009 14:57:29 +0200
-
-ncurses (5.7+20090718-1) unstable; urgency=low
-
-  * Merging upstream version 5.7+20090718.
-
- -- Daniel Baumann <daniel@debian.org>  Mon, 03 Aug 2009 14:23:38 +0200
-
-ncurses (5.7+20090711-1) unstable; urgency=low
-
-  * Merging upstream version 5.7+20090711.
-  * Using patch-stamp rather than patch in rules (Closes: #538639).
-
- -- Daniel Baumann <daniel@debian.org>  Wed, 29 Jul 2009 09:17:59 +0200
-
-ncurses (5.7+20090704-1) unstable; urgency=low
-
-  * Merging upstream version 5.7+20090704.
-  * Adding conflicts to old libc in order to allow upgrade for ia32
-    transition (Closes: #538834).
-
- -- Daniel Baumann <daniel@debian.org>  Wed, 29 Jul 2009 08:43:27 +0200
-
-ncurses (5.7+20090627-1) unstable; urgency=low
-
-  * Merging upstream version 5.7+20090627.
-  * Adding patch to remove depends to curses.priv.h for expanded.c,
-    otherwise FTBFS.
-
- -- Daniel Baumann <daniel@debian.org>  Thu, 16 Jul 2009 23:20:13 +0200
-
-ncurses (5.7+20090613-1) unstable; urgency=low
-
-  * Merging upstream version 5.7+20090613.
-
- -- Daniel Baumann <daniel@debian.org>  Tue, 14 Jul 2009 12:42:47 +0200
-
-ncurses (5.7+20090607-1) unstable; urgency=low
-
-  * Merging upstream version 5.7+20090607:
-    - fix a regression in lib_tputs.c (Closes: #536177).
-  * Correcting location of debug symbols in the debug packages (Closes:
-    #532022).
-  * Updating package to standards version 3.8.2.
-
- -- Daniel Baumann <daniel@debian.org>  Wed, 08 Jul 2009 02:24:00 +0200
-
-ncurses (5.7+20090606-1) unstable; urgency=low
-
-  * Merging upstream version 5.7+20090606.
-  * Removing leftovers from ia32 transition (Closes: #535385).
-
- -- Daniel Baumann <daniel@debian.org>  Tue, 07 Jul 2009 17:19:49 +0200
-
-ncurses (5.7+20090530-1) unstable; urgency=low
-
-  * Merging upstream version 5.7+20090530.
-  * Using /{,usr/}lib32 instead of /emul/ia32-linux/ in amd64
-    architecture (Closes: #533012).
-
- -- Daniel Baumann <daniel@debian.org>  Mon, 29 Jun 2009 09:21:07 -0300
-
-ncurses (5.7+20090523-1) unstable; urgency=low
-
-  * Merging upstream version 5.7+20090523.
-
- -- Daniel Baumann <daniel@debian.org>  Sun, 24 May 2009 15:13:01 +0200
-
-ncurses (5.7+20090516-1) unstable; urgency=low
-
-  * Merging upstream version 5.7+20090516:
-
- -- Daniel Baumann <daniel@debian.org>  Mon, 18 May 2009 12:29:59 +0200
-
-ncurses (5.7+20090510-1) unstable; urgency=low
-
-  * Merging upstream version 5.7+20090510.
-
- -- Daniel Baumann <daniel@debian.org>  Mon, 11 May 2009 15:25:16 +0200
-
-ncurses (5.7+20090502-1) unstable; urgency=low
-
-  * Merging upstream version 5.7+20090502.
-  * Using correct rfc-2822 date formats in changelog.
-
- -- Daniel Baumann <daniel@debian.org>  Tue, 05 May 2009 00:19:41 +0200
-
-ncurses (5.7+20090425-1) unstable; urgency=low
-
-  * Merging upstream version 5.7+20090425.
-
- -- Daniel Baumann <daniel@debian.org>  Mon, 04 May 2009 10:25:00 +0200
-
-ncurses (5.7+20090419-1) unstable; urgency=low
-
-  * Merging upstream version 5.7+20090419.
-
- -- Daniel Baumann <daniel@debian.org>  Sun, 03 May 2009 13:07:00 +0200
-
-ncurses (5.7+20090418-1) UNRELEASED; urgency=low
-
-  * Merging upstream version 5.7+20090418.
-
- -- Daniel Baumann <daniel@debian.org>  Sun, 03 May 2009 13:01:00 +0200
-
-ncurses (5.7+20090411-1) unstable; urgency=low
-
-  * Merging upstream version 5.7+20090411.
-
- -- Daniel Baumann <daniel@debian.org>  Sun, 12 Apr 2009 21:01:00 +0200
-
-ncurses (5.7+20090404-1) unstable; urgency=low
-
-  * Merging upstream version 5.7+20090404.
-
- -- Daniel Baumann <daniel@debian.org>  Mon, 06 Apr 2009 11:22:00 +0200
-
-ncurses (5.7+20090328-1) unstable; urgency=low
-
-  * Merging upstream version 5.7+20090328.
-
- -- Daniel Baumann <daniel@debian.org>  Sun, 05 Apr 2009 11:12:00 +0200
-
-ncurses (5.7+20090321-1) unstable; urgency=low
-
-  * Merging upstream version 5.7+20090321.
-  * Updating section of debug packages.
-  * Updating to standards version 3.8.1.
-
- -- Daniel Baumann <daniel@debian.org>  Mon, 30 Mar 2009 11:11:00 +0200
-
-ncurses (5.7+20090314-1) unstable; urgency=low
-
-  * Merging upstream version 5.7+20090314.
-
- -- Daniel Baumann <daniel@debian.org>  Thu, 14 Mar 2009 07:14:00 +0100
-
-ncurses (5.7+20090228-1) unstable; urgency=low
-
-  * Merging upstream version 5.7+20090228.
-
- -- Daniel Baumann <daniel@debian.org>  Sun, 01 Mar 2009 23:06:00 +0100
-
-ncurses (5.7+20090221-1) unstable; urgency=low
-
-  * Merging upstream version 5.7+20090221.
-
- -- Daniel Baumann <daniel@debian.org>  Thu, 26 Feb 2009 11:26:00 +0100
-
-ncurses (5.7+20090214-1) unstable; urgency=low
-
-  * Merging upstream version 5.7+20090214.
-
- -- Daniel Baumann <daniel@debian.org>  Wed, 18 Feb 2009 14:44:00 +0100
-
-ncurses (5.7+20090207-1) unstable; urgency=low
-
-  * Merging upstream version 5.7+20090207.
-
- -- Daniel Baumann <daniel@debian.org>  Tue, 10 Feb 2009 16:07:00 +0100
-
-ncurses (5.7+20090124-1) unstable; urgency=low
-
-  * Merging upstream version 5.7+20090124.
-  * Removing bash.dpatch, went upstream.
-
- -- Daniel Baumann <daniel@debian.org>  Mon, 26 Jan 2009 01:50:00 +0100
-
-ncurses (5.7+20090117-1) unstable; urgency=low
-
-  * Merging upstream version 5.7+20090117.
-  * Applying patch from David Riebenbauer <davrieb@liegesta.at> to avoid
-    bashism in ncurses-config (Closes: #512161).
-
- -- Daniel Baumann <daniel@debian.org>  Sun, 18 Jan 2009 09:18:00 -0500
-
-ncurses (5.7+20090110-1) unstable; urgency=low
-
-  * Merging upstream version 5.7+20090110.
-
- -- Daniel Baumann <daniel@debian.org>  Wed, 14 Jan 2009 10:49:00 -0500
-
-ncurses (5.7+20090105-1) unstable; urgency=low
-
-  * AMerging upstream version 5.7+20090105.
-
- -- Daniel Baumann <daniel@debian.org>  Sat, 10 Jan 2009 13:14:11 -0500
-
-ncurses (5.7+20090104-1) unstable; urgency=low
-
-  * Merging upstream version 5.7+20090104.
-
- -- Daniel Baumann <daniel@debian.org>  Sat, 10 Jan 2009 12:39:00 -0500
-
-ncurses (5.7+20090103-1) UNRELEASED; urgency=low
-
-  * Merging upstream version 5.7+20090103.
-
- -- Daniel Baumann <daniel@debian.org>  Sat, 10 Jan 2009 11:12:00 -0500
-
-ncurses (5.7+20081227-1) unstable; urgency=low
-
-  * Merging upstream version 5.7+20081227.
-
- -- Daniel Baumann <daniel@debian.org>  Fri, 09 Jan 2009 15:46:41 -0500
-
-ncurses (5.7+20081220-1) unstable; urgency=low
-
-  * Merging upstream version 5.7+20081220.
-
- -- Daniel Baumann <daniel@debian.org>  Thu, 25 Dec 2008 11:51:00 +0100
-
 ncurses (5.7+20081213-1) unstable; urgency=low
 
   * Merging upstream version 5.7+20081213.
@@ -507,14 +50,14 @@ ncurses (5.7-2) unstable; urgency=low
   * Temporarily downgrading sodepver again; this was actually ment to go to
     lenny, but I'm to tired to push it... (Closes: #504745).
 
- -- Daniel Baumann <daniel@debian.org>  Fri, 07 Nov 2008 21:06:00 +0100
+ -- Daniel Baumann <daniel@debian.org>  Fri,  7 Nov 2008 21:06:00 +0100
 
 ncurses (5.7-1) unstable; urgency=low
 
   * Merging upstream version 5.7.
   * Updating soname and sodepver to 5.7 in rules.
 
- -- Daniel Baumann <daniel@debian.org>  Wed, 05 Nov 2008 21:34:00 +0100
+ -- Daniel Baumann <daniel@debian.org>  Wed,  5 Nov 2008 21:34:00 +0100
 
 ncurses (5.6+20081025-1) unstable; urgency=low
 
@@ -556,13 +99,13 @@ ncurses (5.6+20081004-1) unstable; urgency=low
 
   * Merging upstream version 5.6+20081004.
 
- -- Daniel Baumann <daniel@debian.org>  Thu, 09 Oct 2008 14:20:00 +0200
+ -- Daniel Baumann <daniel@debian.org>  Thu,  9 Oct 2008 14:20:00 +0200
 
 ncurses (5.6+20080927-1) unstable; urgency=low
 
   * Merging upstream version 5.6+20080927.
 
- -- Daniel Baumann <daniel@debian.org>  Wed, 08 Oct 2008 21:18:00 +0200
+ -- Daniel Baumann <daniel@debian.org>  Wed,  8 Oct 2008 21:18:00 +0200
 
 ncurses (5.6+20080925-1) unstable; urgency=low
 
@@ -598,7 +141,7 @@ ncurses (5.6+20080906-1) unstable; urgency=low
   * Updating vcs fields in control file.
   * Merging upstream version 5.6+20080906.
 
- -- Daniel Baumann <daniel@debian.org>  Sun, 07 Sep 2008 21:43:00 +0200
+ -- Daniel Baumann <daniel@debian.org>  Sun,  7 Sep 2008 21:43:00 +0200
 
 ncurses (5.6+20080830-1) unstable; urgency=medium
 
@@ -606,7 +149,7 @@ ncurses (5.6+20080830-1) unstable; urgency=medium
   * Switching kdch1 from \177 to \E[3~ in debians, for legacy reasons, own
     embedded xterm defintions (Closes: #319554).
 
- -- Daniel Baumann <daniel@debian.org>  Mon, 01 Sep 2008 13:23:00 +0200
+ -- Daniel Baumann <daniel@debian.org>  Mon,  1 Sep 2008 13:23:00 +0200
 
 ncurses (5.6+20080823-1) unstable; urgency=low
 
@@ -625,20 +168,20 @@ ncurses (5.6+20080804-1) unstable; urgency=low
 
   * Merging upstream version 5.6+20080804.
 
- -- Daniel Baumann <daniel@debian.org>  Tue, 05 Aug 2008 13:53:00 +0200
+ -- Daniel Baumann <daniel@debian.org>  Tue,  5 Aug 2008 13:53:00 +0200
 
 ncurses (5.6+20080726-2) unstable; urgency=medium
 
   * Adding patch from Neil Williams <codehelp@debian.org> to ensure wchar.h is
     available for make_keys when cross-building.
 
- -- Daniel Baumann <daniel@debian.org>  Mon, 04 Aug 2008 23:31:00 +0200
+ -- Daniel Baumann <daniel@debian.org>  Mon,  4 Aug 2008 23:31:00 +0200
 
 ncurses (5.6+20080726-1) unstable; urgency=low
 
   * Merging upstream version 5.6+20080726.
 
- -- Daniel Baumann <daniel@debian.org>  Sun, 03 Aug 2008 23:00:00 +0200
+ -- Daniel Baumann <daniel@debian.org>  Sun,  3 Aug 2008 23:00:00 +0200
 
 ncurses (5.6+20080713-1) unstable; urgency=low
 
@@ -695,7 +238,7 @@ ncurses (5.6+20080531-1) unstable; urgency=low
 
   * New upstream patch level.
 
- -- Daniel Baumann <daniel@debian.org>  Sun, 01 Jun 2008 12:35:00 +0200
+ -- Daniel Baumann <daniel@debian.org>  Sun,  1 Jun 2008 12:35:00 +0200
 
 ncurses (5.6+20080503-1) unstable; urgency=low
 
@@ -703,7 +246,7 @@ ncurses (5.6+20080503-1) unstable; urgency=low
     - Modifies screen.* terminfo entries using new screen+fkeys to fix
       overridden keys in screen.rxvt (Closes: #478094).
 
- -- Daniel Baumann <daniel@debian.org>  Tue, 06 May 2008 13:27:00 +0200
+ -- Daniel Baumann <daniel@debian.org>  Tue,  6 May 2008 13:27:00 +0200
 
 ncurses (5.6+20080419-2) unstable; urgency=low
 
@@ -722,13 +265,13 @@ ncurses (5.6+20080405-2) experimental; urgency=low
 
   * Adding 32bit libncursesw5 packages (Closes: #457363).
 
- -- Daniel Baumann <daniel@debian.org>  Wed, 09 Apr 2008 07:31:00 +0200
+ -- Daniel Baumann <daniel@debian.org>  Wed,  9 Apr 2008 07:31:00 +0200
 
 ncurses (5.6+20080405-1) unstable; urgency=medium
 
   * New upstream patch level.
 
- -- Daniel Baumann <daniel@debian.org>  Mon, 07 Apr 2008 21:37:00 +0200
+ -- Daniel Baumann <daniel@debian.org>  Mon,  7 Apr 2008 21:37:00 +0200
 
 ncurses (5.6+20080308-1) unstable; urgency=low
 
@@ -740,7 +283,7 @@ ncurses (5.6+20080203-1) unstable; urgency=low
 
   * New upstream patch level.
 
- -- Daniel Baumann <daniel@debian.org>  Sat, 09 Feb 2008 17:41:00 +0100
+ -- Daniel Baumann <daniel@debian.org>  Sat,  9 Feb 2008 17:41:00 +0100
 
 ncurses (5.6+20080119-1) unstable; urgency=low
 
@@ -771,7 +314,7 @@ ncurses (5.6+20071103-1) unstable; urgency=low
 
   * New upstream patch level.
 
- -- Daniel Baumann <daniel@debian.org>  Sun, 04 Nov 2007 15:10:00 +0100
+ -- Daniel Baumann <daniel@debian.org>  Sun,  4 Nov 2007 15:10:00 +0100
 
 ncurses (5.6+20071013-1) unstable; urgency=low
 
@@ -798,7 +341,7 @@ ncurses (5.6+20071006-1) unstable; urgency=low
 
   * New upstream patch level.
 
- -- Daniel Baumann <daniel@debian.org>  Tue, 09 Oct 2007 10:57:00 +0200
+ -- Daniel Baumann <daniel@debian.org>  Tue,  9 Oct 2007 10:57:00 +0200
 
 ncurses (5.6+20070908-1) unstable; urgency=low
 
@@ -835,13 +378,13 @@ ncurses (5.6+20070602-1) experimental; urgency=low
 
   * New upstream patch level.
 
- -- Daniel Baumann <daniel@debian.org>  Sun, 03 Jun 2007 18:28:00 +0200
+ -- Daniel Baumann <daniel@debian.org>  Sun,  3 Jun 2007 18:28:00 +0200
 
 ncurses (5.6+20070526-1) experimental; urgency=low
 
   * New upstream patch level.
 
- -- Daniel Baumann <daniel@debian.org>  Fri, 01 Jun 2007 21:36:00 +0200
+ -- Daniel Baumann <daniel@debian.org>  Fri,  1 Jun 2007 21:36:00 +0200
 
 ncurses (5.6-3) unstable; urgency=low
 
@@ -894,7 +437,7 @@ ncurses (5.5-3) unstable; urgency=low
   * New maintainer (Closes: #385928).
   * Bumped policy version (no changes needed).
 
- -- Daniel Baumann <daniel@debian.org>  Mon, 04 Sep 2006 15:57:00 +0200
+ -- Daniel Baumann <daniel@debian.org>  Mon,  4 Sep 2006 15:57:00 +0200
 
 ncurses (5.5-2) unstable; urgency=low
 
@@ -1083,7 +626,7 @@ ncurses (5.3.20030719-4) unstable; urgency=low
 
   * Add missing build dependency for s390x (Closes: #210307).
 
- -- Daniel Jacobowitz <dan@debian.org>  Fri, 07 Nov 2003 14:05:42 -0500
+ -- Daniel Jacobowitz <dan@debian.org>  Fri,  7 Nov 2003 14:05:42 -0500
 
 ncurses (5.3.20030719-3) unstable; urgency=low
 
@@ -1140,7 +683,7 @@ ncurses (5.3.20021109-2) unstable; urgency=low
   * Update screen terminfo entry (Closes: #165222).
   * Fix a typo in tset (Closes: #171583).
 
- -- Daniel Jacobowitz <dan@debian.org>  Wed, 04 Dec 2002 09:45:43 -0500
+ -- Daniel Jacobowitz <dan@debian.org>  Wed,  4 Dec 2002 09:45:43 -0500
 
 ncurses (5.3.20021109-1) unstable; urgency=low
 
@@ -1155,7 +698,7 @@ ncurses (5.2.20020112a-8) unstable; urgency=low
   * Depend on libc-dev instead of libc6-dev (Closes: #145569).
   * Re-enable trace support in libncurses5-dbg (Closes: #146033).
 
- -- Daniel Jacobowitz <dan@debian.org>  Thu, 09 May 2002 17:46:11 -0400
+ -- Daniel Jacobowitz <dan@debian.org>  Thu,  9 May 2002 17:46:11 -0400
 
 ncurses (5.2.20020112a-7) unstable; urgency=low
 
@@ -1246,7 +789,7 @@ ncurses (5.2.20010318-2) unstable; urgency=low
   * Fix S/390 varargs handling by removing an illegal cast (Closes: 97945).
   * Append to LD_LIBRARY_PATH so we don't break fakeroot.
 
- -- Daniel Jacobowitz <dan@debian.org>  Sat, 02 Jun 2001 12:27:38 -0700
+ -- Daniel Jacobowitz <dan@debian.org>  Sat,  2 Jun 2001 12:27:38 -0700
 
 ncurses (5.2.20010318-1) unstable; urgency=low
 
@@ -1292,7 +835,7 @@ ncurses (5.2-1) unstable; urgency=low
   * Add new xterm terminfo entry from XFree86 4.0.2
     (Closes: #79295, #58850, #72236, #30567, #55146).
 
- -- Daniel Jacobowitz <dan@debian.org>  Tue, 06 Mar 2001 01:07:40 -0500
+ -- Daniel Jacobowitz <dan@debian.org>  Tue,  6 Mar 2001 01:07:40 -0500
 
 ncurses (5.0-8) unstable; urgency=high
 
@@ -1306,7 +849,7 @@ ncurses (5.0-7) unstable; urgency=low
   * Non-maintainer upload.
   * debian/mach-color.ti: Add pairs and op capabilities.
 
- -- Marcus Brinkmann <brinkmd@debian.org>  Tue, 08 Aug 2000 23:08:25 +0200
+ -- Marcus Brinkmann <brinkmd@debian.org>  Tue,  8 Aug 2000 23:08:25 +0200
 
 ncurses (5.0-6) frozen unstable; urgency=low
 
@@ -1315,7 +858,7 @@ ncurses (5.0-6) frozen unstable; urgency=low
   * Backout keyboard policy change to xterm-color on recommendation
     of Branden Robinson <branden@debian.org>.
 
- -- Joel Klecker <ncurses-maint@debian.org>  Tue, 01 Feb 2000 22:57:22 -0800
+ -- Joel Klecker <ncurses-maint@debian.org>  Tue,  1 Feb 2000 22:57:22 -0800
 
 ncurses (5.0-5) frozen unstable; urgency=low
 
@@ -1344,7 +887,7 @@ ncurses (5.0-3) unstable; urgency=low
   * Add patch for powerpc from Dan Jacobowitz (dan@debian.org).
   * debian/rules: Zap --with-gpm.
 
- -- Joel Klecker <espy@debian.org>  Thu, 06 Jan 2000 17:26:59 -0800
+ -- Joel Klecker <espy@debian.org>  Thu,  6 Jan 2000 17:26:59 -0800
 
 ncurses (5.0-2) unstable; urgency=low
 
@@ -1382,7 +925,7 @@ ncurses5 (5.0-1) unstable; urgency=low
   * Ported the changes made to 4.2 to 5.0
   * Changed ncurses to ncurses5
 
- -- Vaidhyanathan G Mayilrangam <vaidhy@debian.org>  Mon, 06 Dec 1999 01:16:52 -0500
+ -- Vaidhyanathan G Mayilrangam <vaidhy@debian.org>  Mon,  6 Dec 1999 01:16:52 -0500
 
 ncurses (4.2-3.4) unstable; urgency=low
 
@@ -1410,7 +953,7 @@ ncurses (4.2-3.1) unstable; urgency=low
   * Non-maintainer release.
   * Rebuild for glibc 2.1.
 
- -- Joel Klecker <espy@debian.org>  Tue, 02 Mar 1999 23:25:27 -0800
+ -- Joel Klecker <espy@debian.org>  Tue,  2 Mar 1999 23:25:27 -0800
 
 ncurses (4.2-3) frozen unstable; urgency=low
 
@@ -1430,7 +973,7 @@ ncurses (4.2-2) unstable; urgency=low
   * Debian rxvt now clears screen on rmcup (#22289)
   * ncurses-term: Added xterm-color symlink to color_xterm (#16804 et al)
 
- -- Galen Hazelwood <galenh@debian.org>  Fri, 09 Oct 1998 16:04:22 -0600
+ -- Galen Hazelwood <galenh@debian.org>  Fri,  9 Oct 1998 16:04:22 -0600
 
 ncurses (4.2-1) unstable; urgency=low
 
@@ -1438,7 +981,7 @@ ncurses (4.2-1) unstable; urgency=low
   * Integrated jdassen's remake of debian/rules, now uses debhelper
   * Updated security patches
 
- -- Galen Hazelwood <galenh@debian.org>  Mon, 05 Oct 1998 08:15:53 -0600
+ -- Galen Hazelwood <galenh@debian.org>  Mon,  5 Oct 1998 08:15:53 -0600
 
 ncurses (4.2-0) experimental; urgency=low
 
@@ -1451,7 +994,7 @@ ncurses (1.9.9g-8.10) stable unstable; urgency=high
 
   * Rebuilt so that dialog and sc do not coredump.
 
- -- Santiago Vila <sanvila@ctv.es>  Wed, 09 Sep 1998 13:28:02 +0200
+ -- Santiago Vila <sanvila@ctv.es>  Wed,  9 Sep 1998 13:28:02 +0200
 
 ncurses (1.9.9g-8.9.1) stable; urgency=high (security fix)
 
@@ -1578,7 +1121,7 @@ ncurses (1.9.9g-8.1) frozen unstable; urgency=low
     compatibility.
   * Fixed some file/directory permissions.
 
- -- J.H.M. Dassen (Ray) <jdassen@wi.LeidenUniv.nl>  Fri, 08 May 1998 08:46:23 +0200
+ -- J.H.M. Dassen (Ray) <jdassen@wi.LeidenUniv.nl>  Fri,  8 May 1998 08:46:23 +0200
 
 ncurses (1.9.9g-8) unstable; urgency=low
 
@@ -1586,7 +1129,7 @@ ncurses (1.9.9g-8) unstable; urgency=low
   * New rxvt entry (#16363, #16430, #17457, #17676)
   * New screen entry (#17675)
 
- -- Galen Hazelwood <galenh@micron.net>  Sun, 01 Feb 1998 14:42:07 -0700
+ -- Galen Hazelwood <galenh@micron.net>  Sun,  1 Feb 1998 14:42:07 -0700
 
 ncurses (1.9.9g-7) unstable; urgency=low
 
