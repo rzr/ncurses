@@ -79,7 +79,7 @@
 
 #include <curses.priv.h>
 
-MODULE_ID("$Id: lib_mouse.c,v 1.102 2008/10/18 21:48:55 tom Exp $")
+MODULE_ID("$Id: lib_mouse.c,v 1.104 2008/11/30 01:37:27 tom Exp $")
 
 #include <term.h>
 #include <tic.h>
@@ -694,11 +694,16 @@ _nc_mouse_event(SCREEN *sp GCC_UNUSED)
 
 #if USE_GPM_SUPPORT
     case M_GPM:
-	{
+	if (sp->_mouse_fd >= 0) {
 	    /* query server for event, return TRUE if we find one */
 	    Gpm_Event ev;
 
-	    if (my_Gpm_GetEvent(&ev) == 1) {
+	    switch (my_Gpm_GetEvent(&ev)) {
+	    case 0:
+		/* Connection closed, drop the mouse. */
+		sp->_mouse_fd = -1;
+		break;
+	    case 1:
 		/* there's only one mouse... */
 		eventp->id = NORMAL_EVENT;
 
@@ -731,6 +736,7 @@ _nc_mouse_event(SCREEN *sp GCC_UNUSED)
 		/* bump the next-free pointer into the circular list */
 		sp->_mouse_eventp = eventp = NEXT(eventp);
 		result = TRUE;
+		break;
 	    }
 	}
 	break;
@@ -1397,10 +1403,16 @@ mouseinterval(int maxclick)
 
 /* This may be used by other routines to ask for the existence of mouse
    support */
-NCURSES_EXPORT(int)
-_nc_has_mouse(void)
+NCURSES_EXPORT(bool)
+_nc_has_mouse(SCREEN *sp)
 {
-    return (SP->_mouse_type == M_NONE ? 0 : 1);
+    return ((sp->_mouse_type == M_NONE) ? FALSE : TRUE);
+}
+
+NCURSES_EXPORT(bool)
+has_mouse(void)
+{
+    return _nc_has_mouse(SP);
 }
 
 NCURSES_EXPORT(bool)

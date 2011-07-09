@@ -1,5 +1,5 @@
 /****************************************************************************
- * Copyright (c) 1998-2006,2008 Free Software Foundation, Inc.              *
+ * Copyright (c) 1998-2008,2009 Free Software Foundation, Inc.              *
  *                                                                          *
  * Permission is hereby granted, free of charge, to any person obtaining a  *
  * copy of this software and associated documentation files (the            *
@@ -36,7 +36,7 @@
 #include <curses.priv.h>
 #include <ctype.h>
 
-MODULE_ID("$Id: lib_addch.c,v 1.113 2008/08/16 19:20:04 tom Exp $")
+MODULE_ID("$Id: lib_addch.c,v 1.115 2009/01/17 20:37:32 tom Exp $")
 
 static const NCURSES_CH_T blankchar = NewChar(BLANK_TEXT);
 
@@ -265,15 +265,25 @@ waddch_literal(WINDOW *win, NCURSES_CH_T ch)
 	    int len = _nc_build_wch(win, CHREF(ch));
 
 	    if (len >= -1) {
-		/* handle EILSEQ */
+		attr_t attr = AttrOf(ch);
+
+		/* handle EILSEQ (i.e., when len >= -1) */
 		if (is8bits(CharOf(ch))) {
+		    int rc = OK;
 		    const char *s = unctrl((chtype) CharOf(ch));
-		    if (s[1] != 0) {
-			return waddstr(win, s);
+
+		    if (s[1] != '\0') {
+			while (*s != '\0') {
+			    rc = waddch(win, UChar(*s) | attr);
+			    if (rc != OK)
+				break;
+			    ++s;
+			}
+			return rc;
 		    }
 		}
 		if (len == -1)
-		    return waddch(win, ' ');
+		    return waddch(win, ' ' | attr);
 	    } else {
 		return OK;
 	    }
@@ -327,6 +337,7 @@ waddch_literal(WINDOW *win, NCURSES_CH_T ch)
 		    return ERR;
 		x = win->_curx;
 		y = win->_cury;
+		line = win->_line + y;
 	    }
 	    /*
 	     * Check for cells which are orphaned by adding this character, set

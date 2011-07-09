@@ -640,6 +640,7 @@
 ./man/ncurses.3x
 ./man/panel.3x
 ./man/resizeterm.3x
+./man/tabs.1
 ./man/term.5
 ./man/term.7
 ./man/terminfo.head
@@ -694,6 +695,7 @@
 ./misc/emx.src
 ./misc/form.def
 ./misc/form.ref
+./misc/gen-pkgconfig.in
 ./misc/gen_edit.sh
 ./misc/jpf-indent
 ./misc/makedef.cmd
@@ -947,6 +949,7 @@
 ./progs/infocmp.c
 ./progs/modules
 ./progs/progs.priv.h
+./progs/tabs.c
 ./progs/tic.c
 ./progs/toe.c
 ./progs/tput.c
@@ -963,6 +966,7 @@
 ./test/cardfile.c
 ./test/cardfile.dat
 ./test/chgat.c
+./test/clip_printw.c
 ./test/color_set.c
 ./test/configure
 ./test/configure.in
@@ -990,6 +994,7 @@
 ./test/inch_wide.c
 ./test/inchs.c
 ./test/ins_wide.c
+./test/insdelln.c
 ./test/inserts.c
 ./test/key_names.c
 ./test/keynames.c

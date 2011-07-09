@@ -1,6 +1,6 @@
-# $Id: mk-1st.awk,v 1.78 2007/03/24 22:10:55 tom Exp $
+# $Id: mk-1st.awk,v 1.80 2009/01/04 21:51:38 tom Exp $
 ##############################################################################
-# Copyright (c) 1998-2006,2007 Free Software Foundation, Inc.                #
+# Copyright (c) 1998-2007,2008 Free Software Foundation, Inc.                #
 #                                                                            #
 # Permission is hereby granted, free of charge, to any person obtaining a    #
 # copy of this software and associated documentation files (the "Software"), #
@@ -59,7 +59,7 @@ function is_ticlib() {
 		return ( subset ~ /^ticlib$/ );
 	}
 function is_termlib() {
-		return ( subset ~ /^(ticlib\+)?termlib(\+ext_tinfo)?$/ );
+		return ( subset ~ /^(ticlib\+)?termlib((\+[^+ ]+)*\+ext_tinfo)?$/ );
 	}
 # see lib_name
 function lib_name_of(a_name) {
@@ -404,7 +404,7 @@ END	{
 			{
 				end_name = lib_name;
 				printf "../lib/%s : $(%s_OBJS)\n", lib_name, OBJS
-				printf "\t$(AR) $(AR_OPTS) $@ $?\n"
+				printf "\t$(AR) $(ARFLAGS) $@ $?\n"
 				printf "\t$(RANLIB) $@\n"
 				if ( host == "vxworks" )
 				{
