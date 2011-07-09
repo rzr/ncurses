@@ -1,5 +1,5 @@
 /****************************************************************************
- * Copyright (c) 2007-2008,2009 Free Software Foundation, Inc.              *
+ * Copyright (c) 1999-2007,2008 Free Software Foundation, Inc.              *
  *                                                                          *
  * Permission is hereby granted, free of charge, to any person obtaining a  *
  * copy of this software and associated documentation files (the            *
@@ -29,7 +29,7 @@
 /*
  * Author: Thomas E. Dickey - 2007
  *
- * $Id: dots_mvcur.c,v 1.6 2010/11/14 01:00:44 tom Exp $
+ * $Id: dots_mvcur.c,v 1.2 2008/02/09 18:08:57 tom Exp $
  *
  * A simple demo of the terminfo interface, and mvcur.
  */
@@ -49,17 +49,13 @@ static time_t started;
 static int
 outc(TPUTS_ARG c)
 {
-    int rc = c;
-
     if (interrupted) {
-	char tmp = (char) c;
-	if (write(STDOUT_FILENO, &tmp, 1) == -1)
-	    rc = EOF;
+	char tmp = c;
+	write(STDOUT_FILENO, &tmp, 1);
     } else {
-	if (putc(c, stdout) == EOF)
-	    rc = EOF;
+	putc(c, stdout);
     }
-    return rc;
+    return 0;
 }
 
 static bool
@@ -83,7 +79,7 @@ cleanup(void)
 
     printf("\n\n%ld total chars, rate %.2f/sec\n",
 	   total_chars,
-	   ((double) (total_chars) / (double) (time((time_t *) 0) - started)));
+	   ((double) (total_chars) / (time((time_t *) 0) - started)));
 }
 
 static void
@@ -92,21 +88,22 @@ onsig(int n GCC_UNUSED)
     interrupted = TRUE;
 }
 
-static double
+static float
 ranf(void)
 {
     long r = (rand() & 077777);
-    return ((double) r / 32768.);
+    return ((float) r / 32768.);
 }
 
 int
-main(int argc GCC_UNUSED,
-     char *argv[]GCC_UNUSED)
+main(
+	int argc GCC_UNUSED,
+	char *argv[]GCC_UNUSED)
 {
     int x0 = 1, y0 = 1;
     int x, y, z, p;
-    double r;
-    double c;
+    float r;
+    float c;
     SCREEN *sp;
 
     CATCHALL(onsig);
@@ -123,8 +120,8 @@ main(int argc GCC_UNUSED,
 	    max_colors = -1;
     }
 
-    r = (double) (lines - 4);
-    c = (double) (columns - 4);
+    r = (float) (lines - 4);
+    c = (float) (columns - 4);
     started = time((time_t *) 0);
 
     while (!interrupted) {

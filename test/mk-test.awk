@@ -1,6 +1,6 @@
-# $Id: mk-test.awk,v 1.12 2010/11/06 23:06:48 tom Exp $
+# $Id: mk-test.awk,v 1.5 2007/01/20 21:28:47 tom Exp $
 ##############################################################################
-# Copyright (c) 2006-2007,2010 Free Software Foundation, Inc.                #
+# Copyright (c) 2006,2007 Free Software Foundation, Inc.                     #
 #                                                                            #
 # Permission is hereby granted, free of charge, to any person obtaining a    #
 # copy of this software and associated documentation files (the "Software"), #
@@ -73,52 +73,31 @@ END	{
 	print	"sources:"
 	print	""
 	print	"tags:"
-	print	"	$(CTAGS) *.[ch]"
+	print	"	ctags *.[ch]"
 	print	""
-	print	"# no libraries here"
 	print	"libs \\"
+	print	"install \\"
 	print	"install.libs \\"
-	print	"uninstall.libs:"
+	print	"install.test:"
 	print	""
-	if (INSTALL == "yes") {
-		print	"# we might install the test-programs"
-		print	"install \\"
-		print	"install.test: $(BINDIR) $(TESTS)"
-		print	"	$(SHELL) -c 'for src in $(TESTS); do \\"
-		print	"	dst=`echo $$src | $(TRANSFORM)`; \\"
-		print	"	$(INSTALL_PROG) $$src $(BINDIR)/$$dst; \\"
-		print	"	done'"
-		print	""
-		print	"uninstall \\"
-		print	"uninstall.test:"
-		print	"	$(SHELL) -c 'for src in $(TESTS); do \\"
-		print	"	dst=`echo $$src | $(TRANSFORM)`; \\"
-		print	"	rm -f $(BINDIR)/$$dst; \\"
-		print	"	done'"
-	} else {
-		print	"install \\"
-		print	"install.test \\"
-		print	"uninstall \\"
-		print	"uninstall.test:"
-	}
+	print	"uninstall:"
+	print	"uninstall.libs:"
+	print	"uninstall.test:"
 	print	""
 	print	"mostlyclean ::"
 	print	"	-rm -f core tags TAGS *~ *.bak *.i *.ln *.atac trace"
 	print	""
 	print	"clean :: mostlyclean"
-	print	"	-$(SHELL) -c \"if test -n '$x' ; then $(MAKE) clean x=''; fi\""
+	print	"	-sh -c \"if test -n '$x' ; then $(MAKE) clean x=''; fi\""
 	print	"	-rm -rf *$o screendump *.lis $(TESTS) .libs"
 	print	""
 	print	"distclean :: clean"
-	print	"	-rm -f Makefile ncurses_cfg.h config.status config.log"
+	print	"	-rm -f Makefile ncurses_cfg.h config.*"
 	print	""
 	print	"realclean :: distclean"
 	print	""
 	print	"lint:"
-	print	"	$(SHELL) -c 'for N in $(TESTS); do echo LINT:$$N; $(LINT) $(LINT_OPTS) $(CPPFLAGS) $(srcdir)/$$N.c $(LINT_LIBS); done'"
-	print	"$(BINDIR) :"
-	print	"	mkdir -p $@"
-
+	print	"	sh -c 'for N in $(TESTS); do echo LINT:$$N; $(LINT) $(LINT_OPTS) $(CPPFLAGS) $(srcdir)/$$N.c $(LINT_LIBS); done'"
 
 	if (ECHO_LINK != "") {
 		ECHO_LINK="@ echo linking $@ ... ;"
