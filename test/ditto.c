@@ -1,5 +1,5 @@
 /****************************************************************************
- * Copyright (c) 1998-2009,2010 Free Software Foundation, Inc.              *
+ * Copyright (c) 1998-2007,2008 Free Software Foundation, Inc.              *
  *                                                                          *
  * Permission is hereby granted, free of charge, to any person obtaining a  *
  * copy of this software and associated documentation files (the            *
@@ -29,7 +29,7 @@
 /*
  * Author: Thomas E. Dickey (1998-on)
  *
- * $Id: ditto.c,v 1.40 2010/11/14 01:06:47 tom Exp $
+ * $Id: ditto.c,v 1.32 2008/08/04 13:21:41 tom Exp $
  *
  * The program illustrates how to set up multiple screens from a single
  * program.
@@ -43,6 +43,7 @@
  */
 #include <test.priv.h>
 #include <sys/stat.h>
+#include <errno.h>
 
 #ifdef USE_PTHREADS
 #include <pthread.h>
@@ -136,8 +137,8 @@ peek_fifo(FIFO * fifo, PEEK * peek)
 {
     int result = -1;
     if (peek->sequence < fifo->sequence) {
-	result = fifo->data[THIS_FIFO(peek->sequence)];
 	peek->sequence += 1;
+	result = fifo->data[THIS_FIFO(peek->sequence)];
     }
     return result;
 }
@@ -151,11 +152,12 @@ open_tty(char *path)
     int aslave;
     char slave_name[1024];
     char s_option[sizeof(slave_name) + 80];
+    char *leaf;
 
     if (openpty(&amaster, &aslave, slave_name, 0, 0) != 0
 	|| strlen(slave_name) > sizeof(slave_name) - 1)
 	failed("openpty");
-    if (strrchr(slave_name, '/') == 0) {
+    if ((leaf = strrchr(slave_name, '/')) == 0) {
 	errno = EISDIR;
 	failed(slave_name);
     }
@@ -186,11 +188,7 @@ open_tty(char *path)
 }
 
 static void
-init_screen(
-#if HAVE_USE_WINDOW
-	       SCREEN *sp GCC_UNUSED,
-#endif
-	       void *arg)
+init_screen(SCREEN *sp GCC_UNUSED, void *arg)
 {
     DITTO *target = (DITTO *) arg;
     int high, wide;
@@ -211,7 +209,7 @@ init_screen(
 	WINDOW *inner = derwin(outer, high - 2, wide - 2, 1, 1);
 
 	box(outer, 0, 0);
-	MvWAddStr(outer, 0, 2, target->titles[k]);
+	mvwaddstr(outer, 0, 2, target->titles[k]);
 	wnoutrefresh(outer);
 
 	scrollok(inner, TRUE);
@@ -239,7 +237,6 @@ open_screen(DITTO * target, char **source, int length, int which1)
     target->which1 = which1;
     target->titles = source;
     target->length = length;
-    target->fifo.head = -1;
     target->screen = newterm((char *) 0,	/* assume $TERM is the same */
 			     target->output,
 			     target->input);
@@ -251,15 +248,9 @@ open_screen(DITTO * target, char **source, int length, int which1)
 }
 
 static int
-close_screen(
-#if HAVE_USE_WINDOW
-		SCREEN *sp GCC_UNUSED,
-#endif
-		void *arg GCC_UNUSED)
+close_screen(SCREEN *sp GCC_UNUSED, void *arg GCC_UNUSED)
 {
-#if HAVE_USE_WINDOW
     (void) sp;
-#endif
     (void) arg;
     return endwin();
 }
@@ -268,11 +259,7 @@ close_screen(
  * Read data from the 'source' screen.
  */
 static int
-read_screen(
-#if HAVE_USE_WINDOW
-	       SCREEN *sp GCC_UNUSED,
-#endif
-	       void *arg)
+read_screen(SCREEN *sp GCC_UNUSED, void *arg)
 {
     DDATA *data = (DDATA *) arg;
     DITTO *ditto = &(data->ditto[data->source]);
@@ -291,11 +278,7 @@ read_screen(
  * Write all of the data that's in fifos for the 'target' screen.
  */
 static int
-write_screen(
-#if HAVE_USE_WINDOW
-		SCREEN *sp GCC_UNUSED,
-#endif
-		void *arg GCC_UNUSED)
+write_screen(SCREEN *sp GCC_UNUSED, void *arg GCC_UNUSED)
 {
     DDATA *data = (DDATA *) arg;
     DITTO *ditto = &(data->ditto[data->target]);
@@ -326,7 +309,6 @@ show_ditto(DITTO * data, int count, DDATA * ddata)
 {
     int n;
 
-    (void) data;
     for (n = 0; n < count; n++) {
 	ddata->target = n;
 	USING_SCREEN(data[n].screen, write_screen, (void *) ddata);
@@ -381,8 +363,6 @@ main(int argc, char *argv[])
 
     if ((data = typeCalloc(DITTO, (size_t) argc)) == 0)
 	failed("calloc data");
-
-    assert(data != 0);
 
     for (j = 0; j < argc; j++) {
 	open_screen(&data[j], argv, argc, j);

@@ -1,5 +1,5 @@
 /****************************************************************************
- * Copyright (c) 1998-2009,2010 Free Software Foundation, Inc.              *
+ * Copyright (c) 1998-2005,2006 Free Software Foundation, Inc.              *
  *                                                                          *
  * Permission is hereby granted, free of charge, to any person obtaining a  *
  * copy of this software and associated documentation files (the            *
@@ -26,13 +26,13 @@
  * authorization.                                                           *
  ****************************************************************************/
 /*
- * $Id: firework.c,v 1.27 2010/11/13 20:58:25 tom Exp $
+ * $Id: firework.c,v 1.24 2006/05/20 15:36:08 tom Exp $
  */
 #include <test.priv.h>
 
 #include <time.h>
 
-static short my_bg = COLOR_BLACK;
+static int my_bg = COLOR_BLACK;
 
 static void
 cleanup(void)
@@ -70,7 +70,7 @@ showit(void)
     }
 }
 
-static short
+static int
 get_colour(chtype *bold)
 {
     int attr;
@@ -81,7 +81,7 @@ get_colour(chtype *bold)
 	*bold = A_BOLD;
 	attr &= 7;
     }
-    return (short) (attr);
+    return (attr);
 }
 
 static
@@ -90,50 +90,50 @@ explode(int row, int col)
 {
     chtype bold;
     erase();
-    MvPrintw(row, col, "-");
+    mvprintw(row, col, "-");
     showit();
 
     init_pair(1, get_colour(&bold), my_bg);
-    (void) attrset(COLOR_PAIR(1) | bold);
-    MvPrintw(row - 1, col - 1, " - ");
-    MvPrintw(row + 0, col - 1, "-+-");
-    MvPrintw(row + 1, col - 1, " - ");
+    attrset(COLOR_PAIR(1) | bold);
+    mvprintw(row - 1, col - 1, " - ");
+    mvprintw(row + 0, col - 1, "-+-");
+    mvprintw(row + 1, col - 1, " - ");
     showit();
 
     init_pair(1, get_colour(&bold), my_bg);
-    (void) attrset(COLOR_PAIR(1) | bold);
-    MvPrintw(row - 2, col - 2, " --- ");
-    MvPrintw(row - 1, col - 2, "-+++-");
-    MvPrintw(row + 0, col - 2, "-+#+-");
-    MvPrintw(row + 1, col - 2, "-+++-");
-    MvPrintw(row + 2, col - 2, " --- ");
+    attrset(COLOR_PAIR(1) | bold);
+    mvprintw(row - 2, col - 2, " --- ");
+    mvprintw(row - 1, col - 2, "-+++-");
+    mvprintw(row + 0, col - 2, "-+#+-");
+    mvprintw(row + 1, col - 2, "-+++-");
+    mvprintw(row + 2, col - 2, " --- ");
     showit();
 
     init_pair(1, get_colour(&bold), my_bg);
-    (void) attrset(COLOR_PAIR(1) | bold);
-    MvPrintw(row - 2, col - 2, " +++ ");
-    MvPrintw(row - 1, col - 2, "++#++");
-    MvPrintw(row + 0, col - 2, "+# #+");
-    MvPrintw(row + 1, col - 2, "++#++");
-    MvPrintw(row + 2, col - 2, " +++ ");
+    attrset(COLOR_PAIR(1) | bold);
+    mvprintw(row - 2, col - 2, " +++ ");
+    mvprintw(row - 1, col - 2, "++#++");
+    mvprintw(row + 0, col - 2, "+# #+");
+    mvprintw(row + 1, col - 2, "++#++");
+    mvprintw(row + 2, col - 2, " +++ ");
     showit();
 
     init_pair(1, get_colour(&bold), my_bg);
-    (void) attrset(COLOR_PAIR(1) | bold);
-    MvPrintw(row - 2, col - 2, "  #  ");
-    MvPrintw(row - 1, col - 2, "## ##");
-    MvPrintw(row + 0, col - 2, "#   #");
-    MvPrintw(row + 1, col - 2, "## ##");
-    MvPrintw(row + 2, col - 2, "  #  ");
+    attrset(COLOR_PAIR(1) | bold);
+    mvprintw(row - 2, col - 2, "  #  ");
+    mvprintw(row - 1, col - 2, "## ##");
+    mvprintw(row + 0, col - 2, "#   #");
+    mvprintw(row + 1, col - 2, "## ##");
+    mvprintw(row + 2, col - 2, "  #  ");
     showit();
 
     init_pair(1, get_colour(&bold), my_bg);
-    (void) attrset(COLOR_PAIR(1) | bold);
-    MvPrintw(row - 2, col - 2, " # # ");
-    MvPrintw(row - 1, col - 2, "#   #");
-    MvPrintw(row + 0, col - 2, "     ");
-    MvPrintw(row + 1, col - 2, "#   #");
-    MvPrintw(row + 2, col - 2, " # # ");
+    attrset(COLOR_PAIR(1) | bold);
+    mvprintw(row - 2, col - 2, " # # ");
+    mvprintw(row - 1, col - 2, "#   #");
+    mvprintw(row + 0, col - 2, "     ");
+    mvprintw(row + 1, col - 2, "#   #");
+    mvprintw(row + 2, col - 2, " # # ");
     showit();
 }
 
@@ -162,7 +162,7 @@ main(
     }
     curs_set(0);
 
-    seed = (unsigned) time((time_t *) 0);
+    seed = time((time_t *) 0);
     srand(seed);
     for (;;) {
 	do {
@@ -173,9 +173,9 @@ main(
 	    direction = (start > end) ? -1 : 1;
 	    diff = abs(start - end);
 	} while (diff < 2 || diff >= LINES - 2);
-	(void) attrset(A_NORMAL);
+	attrset(A_NORMAL);
 	for (row = 0; row < diff; row++) {
-	    MvPrintw(LINES - row, start + (row * direction),
+	    mvprintw(LINES - row, start + (row * direction),
 		     (direction < 0) ? "\\" : "/");
 	    if (flag++) {
 		showit();
@@ -187,7 +187,7 @@ main(
 	    showit();
 	    flag = 0;
 	}
-	seed = (unsigned) time((time_t *) 0);
+	seed = time((time_t *) 0);
 	srand(seed);
 	explode(LINES - row, start + (diff * direction));
 	erase();

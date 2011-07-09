@@ -1,6 +1,6 @@
 // * this is for making emacs happy: -*-Mode: C++;-*-
 /****************************************************************************
- * Copyright (c) 2007-2008,2009 Free Software Foundation, Inc.              *
+ * Copyright (c) 2007 Free Software Foundation, Inc.                        *
  *                                                                          *
  * Permission is hereby granted, free of charge, to any person obtaining a  *
  * copy of this software and associated documentation files (the            *
@@ -42,7 +42,7 @@
 #include "internal.h"
 #include "cursesw.h"
 
-MODULE_ID("$Id: cursesw.cc,v 1.51 2009/03/28 21:31:37 tom Exp $")
+MODULE_ID("$Id: cursesw.cc,v 1.49 2007/12/15 23:01:57 tom Exp $")
 
 #define COLORS_NEED_INITIALIZATION  -1
 #define COLORS_NOT_INITIALIZED       0
@@ -287,6 +287,7 @@ NCursesWindow::NCursesWindow(WINDOW *win, int ncols)
 {
     initialize();
     w = win;
+    assert((w->_maxx +1 ) == ncols);
 }
 
 int _nc_xx_ripoff_init(WINDOW *w, int ncols)
@@ -295,7 +296,8 @@ int _nc_xx_ripoff_init(WINDOW *w, int ncols)
 
     RIPOFFINIT init = *prip++;
     if (init) {
-	res = init(*(new NCursesWindow(w,ncols)));
+	NCursesWindow* W = new NCursesWindow(w,ncols);
+	res = init(*W);
     }
     return res;
 }
@@ -462,7 +464,7 @@ NCursesWindow::setcolor(short pair)
 #if HAVE_HAS_KEY
 bool NCursesWindow::has_mouse() const
 {
-    return ((::has_key(KEY_MOUSE) || ::has_mouse())
+    return ((::has_key(KEY_MOUSE) || ::_nc_has_mouse())
 	     ? TRUE : FALSE);
 }
 #endif

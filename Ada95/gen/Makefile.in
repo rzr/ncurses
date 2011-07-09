@@ -1,5 +1,5 @@
 ##############################################################################
-# Copyright (c) 1998-2010,2011 Free Software Foundation, Inc.                #
+# Copyright (c) 1998-2007,2008 Free Software Foundation, Inc.                #
 #                                                                            #
 # Permission is hereby granted, free of charge, to any person obtaining a    #
 # copy of this software and associated documentation files (the "Software"), #
@@ -28,12 +28,11 @@
 #
 #  Author:  Juergen Pfeifer, 1996
 #
-#  $Id: Makefile.in,v 1.74 2011/03/26 23:36:30 tom Exp $
+#  $Id: Makefile.in,v 1.61 2008/10/04 22:58:31 tom Exp $
 #
 .SUFFIXES:
 
 SHELL		= /bin/sh
-VPATH		= @srcdir@
 THIS		= Makefile
 
 x		= @PROG_EXT@
@@ -44,7 +43,9 @@ srcdir		= @srcdir@
 prefix		= @prefix@
 exec_prefix	= @exec_prefix@
 bindir		= @bindir@
-includedir	= @includedir@
+
+ADA_INCLUDE	= $(DESTDIR)@ADA_INCLUDE@
+ADA_OBJECTS	= $(DESTDIR)@ADA_OBJECTS@
 
 INSTALL		= @INSTALL@
 INSTALL_PROG	= @INSTALL_PROGRAM@
@@ -57,7 +58,7 @@ CC		= @CC@
 HOST_CC		= @BUILD_CC@
 CFLAGS		= @CFLAGS@
 
-CPPFLAGS	= @ACPPFLAGS@ @CPPFLAGS@ \
+CPPFLAGS	= @ACPPFLAGS@ \
 		  -DHAVE_CONFIG_H -I$(srcdir)
 
 CCFLAGS		= $(CPPFLAGS) $(CFLAGS)
@@ -80,15 +81,13 @@ RANLIB		= @RANLIB@
 M4		= m4
 M4FLAGS		= -DNCURSES_EXT_FUNCS=@NCURSES_EXT_FUNCS@
 
-ADACURSES_CONFIG = adacurses@DFT_ARG_SUFFIX@-config
+ADACURSES_CONFIG = adacurses-config
 
-WRAPPER		= @NCURSES_SHLIB2@
-
-PROG_GENERATE	= ./generate$x
-GENERATE	= $(PROG_GENERATE) '@DFT_ARG_SUFFIX@'
+WRAPPER		= sh $(top_srcdir)/misc/shlib
+GENERATE	= ./gen$x '@DFT_ARG_SUFFIX@'
 DEL_ADAMODE	= sed -e '/^\-\-\ \ \-\*\-\ ada\ \-\*\-.*/d'
 
-GNATHTML	= `type -p gnathtml || type -p gnathtml.pl 2>/dev/null`
+GNATHTML	= `type -p gnathtml || type -p gnathtml.pl`
 GNATHP          = www.gnat.com
 
 ################################################################################
@@ -167,99 +166,126 @@ libs :	$(GEN_TARGETS)
 
 sources:
 
-$(DESTDIR)$(bindir) :
-	mkdir -p $@
+$(ADA_INCLUDE) \
+$(ADA_OBJECTS) :
+	sh $(top_srcdir)/mkdirs.sh $@
 
 install \
-install.libs :: $(DESTDIR)$(bindir) $(ADACURSES_CONFIG)
-	$(INSTALL_PROG) $(ADACURSES_CONFIG) $(DESTDIR)$(bindir)/$(ADACURSES_CONFIG)
+install.libs :: $(ADA_INCLUDE)
+	@echo installing package $(ALIB) in $(ADA_INCLUDE)
+	@$(top_srcdir)/tar-copy.sh '$(ALIB)*.ad?' $(ADA_SRCDIR) $(ADA_INCLUDE)
+	@$(top_srcdir)/tar-copy.sh '$(ALIB)[-.]*.ad?' $(ADA_SRCDIR) $(ADA_INCLUDE)
+	@test $(srcdir) != ./ && $(top_srcdir)/tar-copy.sh '$(ALIB)*.ad?' $(srcdir)/../src $(ADA_INCLUDE)
+	@test $(srcdir) != ./ && $(top_srcdir)/tar-copy.sh '$(ALIB)[-.]*.ad?' $(srcdir)/../src $(ADA_INCLUDE)
+
+install \
+install.libs :: $(ADA_OBJECTS)
+	@echo installing package $(ALIB) in $(ADA_OBJECTS)
+	@-chmod a-wx $(ADA_SRCDIR)/*.ali
+	@$(top_srcdir)/tar-copy.sh '$(ALIB)*.ali' $(ADA_SRCDIR) $(ADA_OBJECTS)
+	@$(top_srcdir)/tar-copy.sh '$(ALIB)[-.]*.ali' $(ADA_SRCDIR) $(ADA_OBJECTS)
+	@-chmod u+x $(ADA_SRCDIR)/*.ali
+
+install \
+install.libs :: $(DESTDIR)$(bindir) adacurses-config
+	$(INSTALL_PROG) adacurses-config $(DESTDIR)$(bindir)/$(ADACURSES_CONFIG)
+
+uninstall \
+uninstall.libs ::
+	@echo removing package $(ALIB) from $(ADA_INCLUDE)
+	-@cd $(ADA_INCLUDE) && rm -f $(ALIB)[-.]*
+
+uninstall \
+uninstall.libs ::
+	@echo removing package $(ALIB) from $(ADA_OBJECTS)
+	-@cd $(ADA_OBJECTS) && rm -f $(ALIB)[-.]*
 
 uninstall \
 uninstall.libs ::
 	-rm -f $(DESTDIR)$(bindir)/$(ADACURSES_CONFIG)
 
-$(PROG_GENERATE):  gen.o
+gen$x:	gen.o
 	@ECHO_LINK@ $(LINK) $(CFLAGS_NORMAL) gen.o $(LD_FLAGS) -o $@
 
 gen.o:	$(srcdir)/gen.c
 	$(HOST_CC) $(CFLAGS_NORMAL) -c -o $@ $(srcdir)/gen.c
 ################################################################################
-Character_Attribute_Set_Rep: $(PROG_GENERATE)
+Character_Attribute_Set_Rep: gen$x
 	$(WRAPPER) "$(GENERATE) B A" >$@
 
-Base_Defs: $(PROG_GENERATE)
+Base_Defs: gen$x
 	$(WRAPPER) "$(GENERATE) B B" >$@
 
-Color_Defs: $(PROG_GENERATE)
+Color_Defs: gen$x
 	$(WRAPPER) "$(GENERATE) B C" >$@
 
-Window_Offsets: $(PROG_GENERATE)
+Window_Offsets: gen$x
 	$(WRAPPER) "$(GENERATE) B D" >$@
 
-Key_Definitions: $(PROG_GENERATE)
+Key_Definitions: gen$x
 	$(WRAPPER) "$(GENERATE) B K" >$@
 
-Linker_Options: $(PROG_GENERATE)
+Linker_Options: gen$x
 	$(WRAPPER) "$(GENERATE) B L" >$@
 
-ACS_Map: $(PROG_GENERATE)
+ACS_Map: gen$x
 	$(WRAPPER) "$(GENERATE) B M" >$@
 
-Old_Keys: $(PROG_GENERATE)
+Old_Keys: gen$x
 	$(WRAPPER) "$(GENERATE) B O" >$@
 
-Public_Variables: $(PROG_GENERATE)
+Public_Variables: gen$x
 	$(WRAPPER) "$(GENERATE) B P" >$@
 
-AC_Rep: $(PROG_GENERATE)
+AC_Rep: gen$x
 	$(WRAPPER) "$(GENERATE) B R" >$@
 
-Version_Info: $(PROG_GENERATE)
+Version_Info: gen$x
 	$(WRAPPER) "$(GENERATE) B V" >$@
 
-Trace_Defs: $(PROG_GENERATE)
+Trace_Defs: gen$x
 	$(WRAPPER) "$(GENERATE) B T" >$@
 ################################################################################
-Menu_Opt_Rep: $(PROG_GENERATE)
+Menu_Opt_Rep: gen$x
 	$(WRAPPER) "$(GENERATE) M R" >$@
 
-Menu_Base_Defs: $(PROG_GENERATE)
+Menu_Base_Defs: gen$x
 	$(WRAPPER) "$(GENERATE) M B" >$@
 
-Menu_Linker_Options: $(PROG_GENERATE)
+Menu_Linker_Options: gen$x
 	$(WRAPPER) "$(GENERATE) M L" >$@
 
-Item_Rep: $(PROG_GENERATE)
+Item_Rep: gen$x
 	$(WRAPPER) "$(GENERATE) M I" >$@
 ################################################################################
-Form_Opt_Rep: $(PROG_GENERATE)
+Form_Opt_Rep: gen$x
 	$(WRAPPER) "$(GENERATE) F R" >$@
 
-Form_Base_Defs: $(PROG_GENERATE)
+Form_Base_Defs: gen$x
 	$(WRAPPER) "$(GENERATE) F B" >$@
 
-Form_Linker_Options: $(PROG_GENERATE)
+Form_Linker_Options: gen$x
 	$(WRAPPER) "$(GENERATE) F L" >$@
 
-Field_Rep: $(PROG_GENERATE)
+Field_Rep: gen$x
 	$(WRAPPER) "$(GENERATE) F I" >$@
 ################################################################################
-Mouse_Base_Defs: $(PROG_GENERATE)
+Mouse_Base_Defs: gen$x
 	$(WRAPPER) "$(GENERATE) P B" >$@
 
-Mouse_Event_Rep: $(PROG_GENERATE)
+Mouse_Event_Rep: gen$x
 	$(WRAPPER) "$(GENERATE) P M" >$@
 
-Mouse_Events: $(PROG_GENERATE)
+Mouse_Events: gen$x
 	$(WRAPPER) "$(GENERATE) B E" >$@
 
-Panel_Linker_Options: $(PROG_GENERATE)
+Panel_Linker_Options: gen$x
 	$(WRAPPER) "$(GENERATE) P L" >$@
 
-Chtype_Def: $(PROG_GENERATE)
+Chtype_Def: gen$x
 	$(WRAPPER) "$(GENERATE) E C" >$@
 
-Eti_Defs: $(PROG_GENERATE)
+Eti_Defs: gen$x
 	$(WRAPPER) "$(GENERATE) E E" >$@
 ################################################################################
 $(ADA_SRCDIR)/$(ABASE).ads: 	$(srcdir)/$(ABASE).ads.m4 \
@@ -305,7 +331,6 @@ $(ADA_SRCDIR)/$(ABASE)-mouse.ads: $(srcdir)/$(ABASE)-mouse.ads.m4 \
 	$(DEL_ADAMODE) >$@
 
 $(ADA_SRCDIR)/$(ABASE)-panels.ads: $(srcdir)/$(ABASE)-panels.ads.m4 \
-                                  $(GEN_FILES4) \
 				   $(srcdir)/normal.m4
 	$(M4) $(M4FLAGS) -DM4MACRO=$(srcdir)/normal.m4 \
 	$(srcdir)/$(ABASE)-panels.ads.m4 |\
@@ -362,7 +387,7 @@ tags:
 @MAKE_UPPER_TAGS@	etags *.[ch]
 
 mostlyclean ::
-	-rm -f a.out core $(PROG_GENERATE) *.o
+	-rm -f a.out core gen$x *.o
 	-rm -f $(GEN_FILES1)
 	-rm -f $(GEN_FILES2)
 	-rm -f $(GEN_FILES3)
@@ -373,12 +398,12 @@ clean :: mostlyclean
 	-rm -f $(GEN_TARGETS) instab.tmp *.ad[bs] *.html *.ali *.tmp
 
 distclean :: clean
-	-rm -f $(ADACURSES_CONFIG)
+	-rm -f adacurses-config
 	-rm -f Makefile
 
 realclean :: distclean
 
-HTML_DIR = @ADAHTML_DIR@
+HTML_DIR = ../../doc/html/ada
 
 instab.tmp : table.m4 $(GEN_SRC)
 	@rm -f $@
@@ -406,12 +431,10 @@ $(HTML_DIR)/table.html : instab.tmp
 	@rm -f instab.tmp
 
 adahtml:
-	test -n "$(GNATHTML)" || exit 1
 	@find $(HTML_DIR) -type f -exec rm -f {} \;
 	@mkdir -p $(HTML_DIR)
 	cp -p ../src/*.ad[sb] . && chmod +w *.ad[sb]
-@USE_OLD_MAKERULES@	ln -sf ../src/*.ali .
-@USE_GNAT_PROJECTS@	ln -sf ../static-ali/*.ali .	
+	ln -sf ../src/*.ali .
 	@echo "Filtering generated files"
 	@for f in $(GEN_SRC); do \
 	   h=`basename $$f` ;\

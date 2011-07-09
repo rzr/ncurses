@@ -1,5 +1,5 @@
 /****************************************************************************
- * Copyright (c) 2007-2009,2011 Free Software Foundation, Inc.              *
+ * Copyright (c) 2007 Free Software Foundation, Inc.                        *
  *                                                                          *
  * Permission is hereby granted, free of charge, to any person obtaining a  *
  * copy of this software and associated documentation files (the            *
@@ -26,7 +26,7 @@
  * authorization.                                                           *
  ****************************************************************************/
 /*
- * $Id: test_get_wstr.c,v 1.8 2011/01/15 18:15:11 tom Exp $
+ * $Id: test_get_wstr.c,v 1.5 2007/08/11 17:01:43 tom Exp $
  *
  * Author: Thomas E Dickey
  *
@@ -43,9 +43,6 @@
  */
 
 #include <test.priv.h>
-
-#if HAVE_CHGAT
-/* NetBSD curses wchgat */
 
 #if USE_WIDEC_SUPPORT
 
@@ -272,7 +269,7 @@ test_get_wstr(int level, char **argv, WINDOW *strwin)
 	    *buffer = '\0';
 	    rc = ERR;
 	    echo();
-	    (void) wattrset(txtwin, A_REVERSE);
+	    wattrset(txtwin, A_REVERSE);
 	    switch (flavor) {
 	    case eGetStr:
 		if (txtwin != stdscr) {
@@ -310,9 +307,9 @@ test_get_wstr(int level, char **argv, WINDOW *strwin)
 		break;
 	    }
 	    noecho();
-	    (void) wattrset(txtwin, A_NORMAL);
+	    wattrset(txtwin, A_NORMAL);
 	    wprintw(strwin, "%d", rc);
-	    (void) waddwstr(strwin, (wchar_t *) buffer);
+	    waddwstr(strwin, (wchar_t *) buffer);
 	    wnoutrefresh(strwin);
 	    break;
 	default:
@@ -359,14 +356,6 @@ int
 main(void)
 {
     printf("This program requires the wide-ncurses library\n");
-    ExitProgram(EXIT_FAILURE);
-}
-#endif
-#else
-int
-main(void)
-{
-    printf("This program requires the curses chgat function\n");
     ExitProgram(EXIT_FAILURE);
 }
 #endif
